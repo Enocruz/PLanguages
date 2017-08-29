@@ -24,4 +24,39 @@
        (= v1 v2)))
 
 (defn make-sum [a1 a2]
-  (cons '+ (cons a1 (cons a2 ()))))
+  (cond
+    (zero? a1) a2
+    (zero? a2) a1
+    (and (number? a1)
+         (number? a2)) (+ a1 a2)
+    :else (list '+ a1 a2)))
+
+
+(defn make-product [m1 m2]
+  (cond
+    (or (zero? m1) (zero? m2)) 0
+    (= 1 m1) m2
+    (= 1 m2) m1
+    (and (number? m1)
+         (number? m2)) (* m1 m2)
+    :else (list '* m1 m2)))
+
+(defn sum? [exp]
+  (and (list? exp)
+       (= '+ (first exp))))
+
+(defn product? [exp]
+  (and (list? exp)
+       (= '* (first exp))))
+
+(defn addend [exp]
+  (nth exp 1))
+
+(defn augend [exp]
+  (nth exp 2))
+
+(defn multiplier [exp]
+  (nth exp 1))
+
+(defn multiplicand [exp]
+  (nth exp 2))
