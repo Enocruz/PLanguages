@@ -54,7 +54,12 @@ August 31, 2017
 "The function my-flatten removes all the interior parenthesis
   of the list it takes as input. Do not use the predefined flatten
   function."
-
+(defn my-flatten
+  [lst]
+  (cond
+    (empty? lst) lst
+    (list? (first lst)) (concat (my-flatten (first lst)) (my-flatten (rest lst)))
+    :else (cons (first lst) (my-flatten (rest lst)))))
 
 "6"
 (defn exchange [x1 x2 lst]
@@ -129,22 +134,114 @@ August 31, 2017
 "12"
 "The function pack takes a list lst as its argument. If lst contains
 consecutive repeated elements they should be placed in separate sublists."
+(defn pack
+  [lst]
+  (if (empty? lst)
+    ()
+    (loop [accum (conj () (last lst))
+           lst (butlast lst)
+           result ()]
+      (cond
+        (empty? lst) (conj result accum)
+        (= (last accum) (last lst)) (recur (conj accum (last lst)) (butlast lst) result)
+        :else (recur (conj () (last lst)) (butlast lst) (conj result accum))))))
+
 
 "13"
-"The function encode takes a list lst as its argument. Consecutive
-duplicates of elements in lst are encoded as vectors [n e], where n
-is the number of duplicates of the element e."
+(defn encode
+  "Takes a list lst as its argument. Consecutive duplicates of
+   elements in lst are encoded as vectors [n e], where n is the
+   number of duplicates of the element e."
+  [lst]
+  (if (empty? lst)
+    ()
+    (loop [accum  [(first lst)]
+           lst    (rest lst)
+           result []]
+      (cond
+
+        (empty? lst)       (list* (conj result [(count accum)
+                                                (first accum)]))
+
+        (= (first accum)
+           (first lst))    (recur (conj accum (first lst))
+                                  (rest lst)
+                                  result)
+
+        :else              (recur [(first lst)]
+                                  (rest lst)
+                                  (conj result [(count accum)
+                                                (first accum)]))))))
+
 
 "14"
-"The function encode-modified takes a list lst as its argument.
-It works the same as the previous problem, but if an element
-has no duplicates it is simply copied into the result list.
-Only elements with duplicates are converted to [n e] vectors."
+(defn encode-modified
+  "The function encode-modified takes a list lst as its argument.
+  It works the same as the previous problem, but if an element
+  has no duplicates it is simply copied into the result list.
+  Only elements with duplicates are converted to [n e] vectors."
+  [lst]
+  (if (empty? lst)
+    ()
+    (loop [accum  [(first lst)]
+           lst    (rest lst)
+           result []]
+      (cond
+
+        (empty? lst)       (if (= 1 (count accum))
+                             (list* (conj result (first accum)))
+                             (list* (conj result [(count accum)
+                                                  (first accum)])))
+
+
+        (= (first accum)
+           (first lst))    (recur (conj accum (first lst))
+                                  (rest lst)
+                                  result)
+
+        :else              (if (= 1 (count accum))
+                             (recur [(first lst)]
+                                    (rest lst)
+                                    (conj result (first accum)))
+                             (recur [(first lst)]
+                                    (rest lst)
+                                    (conj result [(count accum)
+                                                  (first accum)])))))))
+
+
+
+
+
+
 
 "15"
-"The function decode takes as its argument an encoded list lst
- that has the same structure as the resulting list from
- the previous problem."
+(defn decode
+  "The function decode takes as its argument an encoded list lst
+  that has the same structure as the resulting list from
+  the previous problem."
+  [lst]
+  (if (empty? lst)
+    ()
+    (loop [elem (last lst)
+           lst (butlast lst)
+           result ()]
+      (cond
+        (empty? lst) (cond
+                       (vector? elem) (concat (loop [con (first elem)
+                                                     res ()]
+                                                (cond
+                                                  (= con 0) res
+                                                  :else (recur (dec con) (cons (last elem) res)))) result)
+                       :else (cons elem result))
+        (vector? elem) (recur (last lst) (butlast lst) (concat (loop [con (first elem)
+                                                                      res ()]
+                                                                 (cond
+                                                                   (= con 0) res
+                                                                   :else (recur (dec con) (cons (last elem) res)))) result))
+
+        :else (recur (last lst) (butlast lst) (cons elem result))))))
+
+
 
 "1"
 (deftest test-my-repeat
@@ -177,6 +274,13 @@ Only elements with duplicates are converted to [n e] vectors."
   (is (= '(a 1 b 2 c 3 d 4) (my-interleave '(a b c d) '(1 2 3 4 5))))
   (is (= '(a 1) (my-interleave '(a) '(1 2 3 4 5))))
   (is (= '(a 1) (my-interleave '(a b c d e) '(1)))))
+
+"5"
+(deftest test-my-flatten
+  (is (= () (my-flatten ())))
+  (is (= '(a b c d e) (my-flatten '((a b) ((c) d (e))))))
+  (is (= '(one two three four)
+         (my-flatten '(((one) ((two))) () (three (())) four)))))
 
 "6"
 (deftest test-exchange
@@ -219,3 +323,36 @@ Only elements with duplicates are converted to [n e] vectors."
   (is (= '(a b c d) (compress '(a b c d))))
   (is (= '(a b c a d e) (compress '(a a a a b c c a a d e e e e))))
   (is (= '(a) (compress '(a a a a a a a a a a)))))
+
+"12"
+(deftest test-pack
+  (is (= () (pack ())))
+  (is (= '((a a a a) (b) (c c) (a a) (d) (e e e e))
+         (pack '(a a a a b c c a a d e e e e))))
+  (is (= '((1) (2) (3) (4) (5)) (pack '(1 2 3 4 5))))
+  (is (= '((9 9 9 9 9 9 9 9 9)) (pack '(9 9 9 9 9 9 9 9 9)))))
+
+"13"
+(deftest test-encode
+  (is (= () (encode ())))
+  (is (= '([4 a] [1 b] [2 c] [2 a] [1 d] [4 e])
+         (encode '(a a a a b c c a a d e e e e))))
+  (is (= '([1 1] [1 2] [1 3] [1 4] [1 5]) (encode '(1 2 3 4 5))))
+  (is (= '([9 9]) (encode '(9 9 9 9 9 9 9 9 9)))))
+
+"14"
+(deftest test-encode-modified
+  (is (= () (encode-modified ())))
+  (is (= '([4 a] b [2 c] [2 a] d [4 e])
+         (encode-modified '(a a a a b c c a a d e e e e))))
+  (is (= '(1 2 3 4 5) (encode-modified '(1 2 3 4 5))))
+  (is (= '([9 9]) (encode-modified '(9 9 9 9 9 9 9 9 9)))))
+
+"15"
+(deftest test-decode
+  (is (= () (decode ())))
+  (is (= '(a a a a b c c a a d e e e e)
+         (decode '([4 a] b [2 c] [2 a] d [4 e]))))
+  (is (= '(1 2 3 4 5) (decode '(1 2 3 4 5))))
+  (is (= '(9 9 9 9 9 9 9 9 9) (decode '([9 9])))))
+(run-tests)
