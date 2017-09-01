@@ -115,3 +115,5 @@ September 7, 2017
   (is (= 21/4 (integral 1 2 10 (fn [x]
                                  (integral 3 4 10
                                            (fn [y] (* x y))))))))
+
+(run-tests)
