@@ -5,11 +5,15 @@ Problem Set: Higher-Order Functions
 September 7, 2017
 "
 
+(use 'clojure.test)
+(use 'clojure.math.numeric-tower)
+
+
 (defn aprox=
   "Checks if x is approximately equal to y. Returns true
   if |x - y| < epsilon, or false otherwise."
   [epsilon x y]
-  (< (Math/abs (- x y)) epsilon))
+  (< (abs (- x y)) epsilon))
 
 "1"
 (defn  my-map-indexed
@@ -18,7 +22,14 @@ September 7, 2017
    item of lst, followed by applying f to 1 and the second item
    in lst, and so on until lst is exhausted. Function f should
    accept 2 arguments: index and item."
-  [f lst])
+  [f lst]
+  (loop [count 0 Lst lst Elist '()]
+    (cond
+      (empty? Lst) (reverse Elist)
+      :else (recur (inc count)
+                   (rest Lst)
+                   (conj Elist
+                         (f count (first Lst)))))))
 
 "2"
 (defn my-drop-while
@@ -26,28 +37,65 @@ September 7, 2017
    of items from lst dropping the initial items that evaluate to true
    when passed to f. Once a false value is encountered, the rest
    of the list is returned. Function f should accept one argument."
-  [f lst])
+  [f lst]
+  (loop [nlist '() lst lst]
+    (cond
+      (empty? lst) nlist
+      (true? (f (first lst))) (recur nlist (rest lst))
+      :else (concat nlist lst))))
 
 "3"
 (defn bisection
   "that takes a, b, and f as arguments. It finds the corresponding
   root using the bisection method. The algorithm must stop when a value
    of c is found such that: |f(c)| < 1.0×10-15."
-  [a b f])
+  [a b f]
+  (loop [A a B b C (/ (+ a b) 2)]
+   ;(if (number? A) Resultado)))
+    (cond
+      (< (abs (f C)) (* 1.0 (expt 10 (- 15)))) C
+      (and (< (f C) 0) (> (f B) 0)) (recur C B (/ (+ C B) 2))
+      (and (> (f C) 0) (< (f B) 0)) (recur C B (/ (+ C B) 2))
+      ;(and (> (f c) 0) (> (f b) 0)) (recur (/ (+ A c) 2) A c)
+      :else (recur A C (/ (+ A C) 2)))))
+
+
 
 "4"
 (defn deriv
   "that takes f and h as its arguments, and returns a new function
   that takes x as argument, and which represents the derivate
   of f given a certain value for h."
-  [f h])
+  [f h]
+  (fn [x] (/
+            (- (f (+ x h))
+               (f x)) h)))
+
 
 "5"
 (defn integral
   "that takes as arguments a, b, n, and f. It returns the value
-   of the integral, using Simpson's rule. The unit tests verify
-    the following single and double integrals (with n = 10):"
-  [a b n f])
+   of the integral, using Simpson's rule."
+  [a b n f]
+  (loop [sum 0 h (/ (- b a) n) yk (f a) count 0]
+    (cond
+      (= count n) (* (/ h 3)
+                     (+ sum yk))
+      (zero? count) (recur
+                      (+ sum yk)
+                      h
+                      (f (+ a (* (inc count) h)))
+                      (inc count))
+      (odd? count) (recur
+                     (+ sum (* 4 yk))
+                     h
+                     (f (+ a (* (inc count) h)))
+                     (inc count))
+      :else        (recur
+                     (+ sum (* 2 yk))
+                     h
+                     (f (+ a (* (inc count) h)))
+                     (inc count)))))
 
 "TEST SECTION"
 
