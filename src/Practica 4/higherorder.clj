@@ -44,21 +44,24 @@ September 7, 2017
       (true? (f (first lst))) (recur nlist (rest lst))
       :else (concat nlist lst))))
 
+
 "3"
 (defn bisection
   "that takes a, b, and f as arguments. It finds the corresponding
   root using the bisection method. The algorithm must stop when a value
    of c is found such that: |f(c)| < 1.0×10-15."
   [a b f]
-  (loop [A a B b C (/ (+ a b) 2)]
-   ;(if (number? A) Resultado)))
+  (loop [A a
+         B b
+         C (/ (+ a b) 2)]
+    ;(if (number? A) Resultado)))
     (cond
-      (< (abs (f C)) (* 1.0 (expt 10 (- 15)))) C
-      (and (< (f C) 0) (> (f B) 0)) (recur C B (/ (+ C B) 2))
-      (and (> (f C) 0) (< (f B) 0)) (recur C B (/ (+ C B) 2))
+      (< (abs (f C)) (* 0.5 (expt 10 (- 15)))) C
+      (and (< (f C) 0) (> (f A) 0)) (recur A C (/ (+ A C) 2))
+      (and (> (f C) 0) (< (f A) 0)) (recur A C (/ (+ A C) 2))
       ;(and (> (f c) 0) (> (f b) 0)) (recur (/ (+ A c) 2) A c)
-      :else (recur A C (/ (+ A C) 2)))))
-
+      :else (recur C B (/ (+ C B) 2)))))
+  
 
 
 "4"
