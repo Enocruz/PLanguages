@@ -56,7 +56,7 @@ September 7, 2017
          C (/ (+ a b) 2)]
     ;(if (number? A) Resultado)))
     (cond
-      (< (abs (f C)) (* 0.5 (expt 10 (- 15)))) C
+      (< (abs (f C)) (* 1.0 (expt 10 (- 15)))) C
       (and (< (f C) 0) (> (f A) 0)) (recur A C (/ (+ A C) 2))
       (and (> (f C) 0) (< (f A) 0)) (recur A C (/ (+ A C) 2))
       ;(and (> (f c) 0) (> (f b) 0)) (recur (/ (+ A c) 2) A c)
