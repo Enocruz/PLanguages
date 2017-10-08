@@ -28,7 +28,11 @@ then summing those products."
 "3
 The function pow takes two arguments as input: a number a and a positive integer
 b. It returns the result of computing a raised to the power b."
-
+(defn pow
+  [a b]
+  (reduce *
+          (for [i
+                (range 0 b)] a)))
 
 "4
 The function replic takes two arguments: a list lst and an integer number n, where
@@ -43,30 +47,53 @@ The function expand takes a list lst as its argument. It returns a list where th
 element of lst appears one time, the second elements appears two times, the third element
 appears three times, and so on."
 (defn expand
-  [lst])
+  [lst]
+  (mapcat (fn [x n]
+            (repeat x n))
+          (range
+            1
+            (+ (count lst) 1))
+          lst))
 
 "6
 The function largest takes as argument a nonempty list of numbers lst. It returns the
 largest value contained in lst. Use the reduce function to solve this problem.
 Do not use the predefined max or min functions."
+(defn largest
+  [lst]
+  (reduce
+    #(if
+       (> %1 %2) %1 %2)
+    lst))
 
 "7
 The function drop-every takes two arguments: an integer number n, where n ≥ 1, and a
 list lst. It returns a new list that drops every n-th element from lst. "
+(defn drop-every
+  [n lst]
+  (for [i (filter #(not= 0 (rem % n)) (range 0 (inc (count lst))))]
+    (nth lst (- i 1))))
+
 
 "8
 The function rotate-left takes two arguments: an integer number n and a list lst.
 It returns the list that results from rotating lst a total of n elements to the left.
 If n is negative, it rotates to the right. "
+(defn rotate-left
+  [n lst])
 
 "9
 The function gcd takes two positive integer arguments a and b as arguments, where a > 0 and b > 0.
 It returns the greatest common divisor (GCD) of a and b."
+(defn gcd
+  [a b])
 
 "10
 The function insert-everywhere takes two arguments as input: an object x and a list lst.
 It returns a new list with all the possible ways in which x can be inserted into
 every position of lst. "
+(defn insert-everywhere
+  [x lst])
 
 "1"
 (deftest test-positives)
