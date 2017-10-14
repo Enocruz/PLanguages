@@ -79,28 +79,62 @@ list lst. It returns a new list that drops every n-th element from lst. "
 The function rotate-left takes two arguments: an integer number n and a list lst.
 It returns the list that results from rotating lst a total of n elements to the left.
 If n is negative, it rotates to the right. "
+
+(defn right
+  [n lst]
+  (if (>= n (count lst)) (def a (rem n (count lst))) (def a n))
+  (concat (drop (- (count lst) a) lst) (take (- (count lst) a) lst)))
+
+
+(defn left
+  [n lst]
+  (if (> n (count lst)) (def a (rem n (count lst))) (def a n))
+  (concat (drop a lst) (take a lst)))
+
 (defn rotate-left
-  [n lst])
+  [n lst]
+  (if
+    (empty? lst)
+    lst
+      (if
+        (> n 0)
+        (left n lst)
+        (right (Math/abs n) lst))))
+
 
 "9
 The function gcd takes two positive integer arguments a and b as arguments, where a > 0 and b > 0.
 It returns the greatest common divisor (GCD) of a and b."
+
+(defn divisores
+  [a]
+  (filter
+    #(zero? (mod a %)) (range 1 (inc a))))
+
 (defn gcd
-  [a b])
+  [a b]
+  (->>
+    (for [i (divisores a)]
+      (some #{i} (divisores b)))
+    (filter some?)
+    (last)))
 
 "10
 The function insert-everywhere takes two arguments as input: an object x and a list lst.
 It returns a new list with all the possible ways in which x can be inserted into
 every position of lst. "
 (defn insert-everywhere
-  [x lst])
+  [x lst]
+  (for [i (range 0 (+ (count lst) 1))]
+    (concat (take i lst) (list x) (drop i lst))))
 
+" ********* TEST ********"
 "1"
-(deftest test-positives)
-(is (= () (positives '())))
-(is (= () (positives '(-4 -1 -10 -13 -5))))
-(is (= '(3 6) (positives '(-4 3 -1 -10 -13 6 -5))))
-(is (= '(4 3 1 10 13 6 5) (positives '(4 3 1 10 13 6 5))))
+(deftest test-positives
+  (is (= () (positives '())))
+  (is (= () (positives '(-4 -1 -10 -13 -5))))
+  (is (= '(3 6) (positives '(-4 3 -1 -10 -13 6 -5))))
+  (is (= '(4 3 1 10 13 6 5) (positives '(4 3 1 10 13 6 5)))))
 
 "2"
 (deftest test-dot-product
@@ -188,24 +222,24 @@ every position of lst. "
   (is (= '((1 a) (a 1)) (insert-everywhere 1 '(a))))
   (is (= '((1 a b c) (a 1 b c) (a b 1 c) (a b c 1))
          (insert-everywhere 1 '(a b c))))
-  (is (= '((1 a b c d e
-            (a 1 b c d e)
-            (a b 1 c d e)
-            (a b c 1 d e)
-            (a b c d 1 e)
-            (a b c d e 1)))
+  (is (= '((1 a b c d e)
+           (a 1 b c d e)
+           (a b 1 c d e)
+           (a b c 1 d e)
+           (a b c d 1 e)
+           (a b c d e 1))
          (insert-everywhere 1 '(a b c d e))))
-  (is (= '((x 1 2 3 4 5 6 7 8 9 10
-            (1 x 2 3 4 5 6 7 8 9 10)
-            (1 2 x 3 4 5 6 7 8 9 10)
-            (1 2 3 x 4 5 6 7 8 9 10)
-            (1 2 3 4 x 5 6 7 8 9 10)
-            (1 2 3 4 5 x 6 7 8 9 10)
-            (1 2 3 4 5 6 x 7 8 9 10)
-            (1 2 3 4 5 6 7 x 8 9 10)
-            (1 2 3 4 5 6 7 8 x 9 10)
-            (1 2 3 4 5 6 7 8 9 x 10)
-            (1 2 3 4 5 6 7 8 9 10 x)))
+  (is (= '((x 1 2 3 4 5 6 7 8 9 10)
+           (1 x 2 3 4 5 6 7 8 9 10)
+           (1 2 x 3 4 5 6 7 8 9 10)
+           (1 2 3 x 4 5 6 7 8 9 10)
+           (1 2 3 4 x 5 6 7 8 9 10)
+           (1 2 3 4 5 x 6 7 8 9 10)
+           (1 2 3 4 5 6 x 7 8 9 10)
+           (1 2 3 4 5 6 7 x 8 9 10)
+           (1 2 3 4 5 6 7 8 x 9 10)
+           (1 2 3 4 5 6 7 8 9 x 10)
+           (1 2 3 4 5 6 7 8 9 10 x))
          (insert-everywhere 'x '(1 2 3 4 5 6 7 8 9 10)))))
 
 (run-tests)
