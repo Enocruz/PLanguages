@@ -41,6 +41,20 @@
             'obese2
             'obese3))))))
 
+(defn p [a b]
+  (* a b))
+
+(defn fibo-loop
+  "Returns the n-th element of the Fibonacci sequence.
+  Uses loop/recur"
+  [n]
+  (loop [a 0
+         b 1
+         i 0
+         lst '(1)]
+    (if (= i (- n 1))
+      (reverse lst)
+      (recur b (+ a b) (inc i) (cons (+ a b) lst)))))
 
 (deftest test-add1
   (is (= 6 (add1 5)))
