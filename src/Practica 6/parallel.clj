@@ -5,8 +5,7 @@ Using Parallel Map
 October 26, 2017
 "
 
-(defn prime?
-  "Returns true if n is a prime number, otherwise returns false."
+(defn prime?  "Returns true if n is a prime number, otherwise returns false."
   [n]
   (if (< n 2)
     false
