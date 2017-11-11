@@ -17,6 +17,37 @@
         t#
         (my-or ~@args)))))
 
+"Auxiliary function"
+"If the condition contains while returns true, otherwise return false"
+(defn while?
+  [x]
+  (if (contains? (set x) :while) true false))
+
+"If the condition contains a while, perform this macro"
+(defmacro rep-while
+  [cond & args]
+  `(loop []
+     (when (eval ~(last cond))
+       (do ~@args)
+       (recur))))
+
+"If the condition contains a until, perform this macro"
+(defmacro rep-until
+  [cond & args]
+  `(loop []
+     (when (not (eval ~(last cond)))
+       (do ~@args)
+       (recur))))
+
+"2"
+(defmacro do-loop
+  "Implements a post-test loop control statement. It must combine the
+  functionality of C's do-while statement and Pascal's repeat-until statement."
+  [& body]
+  `(if (while? (quote ~(last body)))
+    (rep-while ~(last body) ~@(butlast body))
+    (rep-until ~(last body) ~@(butlast body))))
+
 "3"
 (defmacro def-pred
   "Takes a name, an arg vector, and a body of one or more expressions.
@@ -27,7 +58,16 @@
   [name vector & args]
   `(do (defn ~name ~vector ~@args)
        (defn ~(symbol (str "not-" name)) ~vector (not (do ~@args)))))
-
+"
+(defmacro a
+  [x]
+  `(fn ~(vector (first x))))
+"
+"4"
+(defmacro defn-curry
+  [name args & body]
+  `(defn ~name
+     ~(vector (first args))))
 
 "5"
 (defn between-keywords
