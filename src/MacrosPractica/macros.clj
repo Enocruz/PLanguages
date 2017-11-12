@@ -17,6 +17,7 @@
         t#
         (my-or ~@args)))))
 
+"2"
 "Auxiliary function"
 "If the condition contains while returns true, otherwise return false"
 (defn while?
@@ -39,7 +40,6 @@
        (do ~@args)
        (recur))))
 
-"2"
 (defmacro do-loop
   "Implements a post-test loop control statement. It must combine the
   functionality of C's do-while statement and Pascal's repeat-until statement."
@@ -58,18 +58,42 @@
   [name vector & args]
   `(do (defn ~name ~vector ~@args)
        (defn ~(symbol (str "not-" name)) ~vector (not (do ~@args)))))
-"
-(defmacro a
-  [x]
-  `(fn ~(vector (first x))))
-"
+
 "4"
+"Creating functions (Auxiliar function)"
+(defn functions
+  [args body]
+  (if (empty? args)
+    `(do ~@body)
+    `(fn ~(vector (first args))
+       ~(functions (rest args) body))))
+
 (defmacro defn-curry
+  "Performs a currying transformation to a function definition.
+  It takes as parameters a name, an args vector, and a body of one
+  or more expressions. The macro defines a function called name
+  that takes only the first argument from args and returns a function
+  that takes the second argument from args and returns a function
+  that takes the third argument from args, and so on. The last
+  function returned takes the last argument from args and
+  evaluates all the expressions in body using a do special form"
   [name args & body]
-  `(defn ~name
-     ~(vector (first args))))
+  (cond
+    (> (count args) 1)
+    `(defn ~name
+         [~(first args)]
+         ~(functions (rest args) body))
+    (= 1 (count args))
+    `(defn ~name
+       [~(first args)]
+       (do ~@body))
+    :else
+      `(defn ~name
+           []
+           (do ~@body))))
 
 "5"
+"Auxiliar function for macro IF"
 (defn between-keywords
   [start end lst]
   (->>
