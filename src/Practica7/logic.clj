@@ -83,7 +83,7 @@ November 26, 2017
   contained in lst."
   [lst result]
   (conde
-    [(=== lst ())
+    [(=== lst [])
      (=== result 0)]
 
     [(fresh [head tail temp]
@@ -174,7 +174,7 @@ November 26, 2017
                    (converto 2 q2)
                    (converto q3 :three)))))
 
-"7"
+"Tests 7"
 (deftest test-splito
   (test-is (= [:yes]
               (run 1 [q] (splito [] [] []) (=== q :yes))))
@@ -208,3 +208,44 @@ November 26, 2017
                 [[_0 _1 _2 _3 _4] [_0 _2 _4] [_1 _3]]
                 [[_0 _1 _2 _3 _4 _5] [_0 _2 _4] [_1 _3 _5]]]
               (run 7 [q1 q2 q3] (splito q1 q2 q3)))))
+
+"Tests 9"
+(deftest test-counto
+  (test-is (= [0]
+              (run 1 [q]
+                   (fd/in q (fd/interval 0 10))
+                   (counto [] q))))
+  (test-is (= [1]
+              (run 1 [q]
+                   (fd/in q (fd/interval 0 10))
+                   (counto [:a] q))))
+  (test-is (= [2]
+              (run 1 [q]
+                   (fd/in q (fd/interval 0 10))
+                   (counto [:a :b] q))))
+  (test-is (= [3]
+              (run 1 [q]
+                   (fd/in q (fd/interval 0 10))
+                   (counto [:a :b :c] q))))
+  (test-is (= [10]
+              (run 1 [q]
+                   (fd/in q (fd/interval 0 10))
+                   (counto (repeat 10 :x) q))))
+  (test-is (= '([_0])
+              (run 1 [q]
+                   (fd/in q (fd/interval 0 10))
+                   (counto q 1))))
+  (test-is (= '([_0 _1 _2 _3 _4])
+              (run 1 [q]
+                   (fd/in q (fd/interval 0 10))
+                   (counto q 5))))
+  (test-is (= '( [[] 0]
+                 [(_0) 1]
+                 [(_0 _1) 2]
+                 [(_0 _1 _2) 3]
+                 [(_0 _1 _2 _3) 4]
+                 [(_0 _1 _2 _3 _4) 5]
+                 [(_0 _1 _2 _3 _4 _5) 6])
+              (run 7 [q1 q2]
+                   (fd/in q1 q2 (fd/interval 0 10))
+                   (counto q1 q2)))))
