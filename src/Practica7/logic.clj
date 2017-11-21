@@ -25,34 +25,58 @@ November 26, 2017
        (removeo x tail temp)
        (appendo [head] temp result))]))
 
+
+(declare oddsizeo)
 "3"
 (defn evensizeo
   "These two mutually recursive logic functions succeed if the
   number of elements in lst is even or odd, respectively."
   [lst]
   (conde
-    [(=== lst ())]
-    [(fresh [h1 h2 t1 t2]
-            (conso h1 t1 lst)
-            (conso h2 t2 t1)
-            (evensizeo t2))]))
+    [(=== lst [])]
+
+    [(fresh [head tail]
+            (conso head tail lst)
+            (oddsizeo tail))]))
+
 (defn oddsizeo
   "These two mutually recursive logic functions succeed if the
   number of elements in lst is even or odd, respectively."
   [lst]
   (conde
-    [(fresh [x]
-            (=== lst [x]))]
-    [(fresh [h1 h2 t1 t2]
-            (conso h1 t1 lst)
-            (conso h2 t2 t1)
-            (oddsizeo t2))]))
+    [(resto lst ())]
+
+    [(fresh [head tail]
+            (conso head tail lst)
+            (!= tail ())
+            (evensizeo tail))]))
 
 "5"
 (defn converto
   "This logic function succeeds when digit d corresponds to the
   keyword k (for example digit 7 with keyword :seven)."
-  [d k])
+  [d k]
+  (conde
+    [(=== d 0)
+     (=== k :zero)]
+    [(=== d 1)
+     (=== k :one)]
+    [(=== d 2)
+     (=== k :two)]
+    [(=== d 3)
+     (=== k :three)]
+    [(=== d 4)
+     (=== k :four)]
+    [(=== d 5)
+     (=== k :five)]
+    [(=== d 6)
+     (=== k :six)]
+    [(=== d 7)
+     (=== k :seven)]
+    [(=== d 8)
+     (=== k :eight)]
+    [(=== d 9)
+     (=== k :nine)]))
 
 "7"
 (defn splito
@@ -91,8 +115,9 @@ November 26, 2017
             (fd/+ temp 1 result)
             (counto tail temp))]))
 
+
 "Tests 1"
-(deftest tes-removeo
+(deftest test-removeo
   (test-is (= [[:b :c :d :e]]
               (run 1 [q] (removeo :a [:a :b :c :d :e] q))))
   (test-is (= [[:a :b :d :e]]
@@ -116,6 +141,7 @@ November 26, 2017
                [:e [:a :b :c :d]]]
               (run* [q1 q2]
                     (removeo q1 [:a :b :c :d :e] q2)))))
+
 
 "Tests 3"
 (deftest test-evensizeo-oddsizeo
@@ -249,3 +275,5 @@ November 26, 2017
               (run 7 [q1 q2]
                    (fd/in q1 q2 (fd/interval 0 10))
                    (counto q1 q2)))))
+
+(run-tests)
