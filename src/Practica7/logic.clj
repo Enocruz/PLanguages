@@ -134,7 +134,10 @@ November 26, 2017
             (counto tail temp))]))
 
 "10"
+
 (defn rangeo
+  " This logic function unifies result with a sequence of
+    incremental integers from start to end"
   [start end result]
   (conde
     [(=== start end)
@@ -143,7 +146,8 @@ November 26, 2017
     [(fd/> start end)
      (=== result [])]
 
-    [(fresh [temp startTemp]
+    [(fd/> end start)
+     (fresh [temp startTemp]
             (appendo [start] temp result)
             (fd/+ start 1 startTemp)
             (rangeo startTemp end temp))]))
@@ -310,6 +314,34 @@ November 26, 2017
                    (counto q1 q2)))))
 
 "Tests 10"
+(deftest test-rangeo
+  (test-is (= [[3 4 5 6 7 8 9 10]]
+              (run 1 [q]
+                   (rangeo 3 10 q))))
+  (test-is (= [[7]]
+              (run 1 [q]
+                   (rangeo 7 7 q))))
+  (test-is (= [[]]
+              (run 1 [q]
+                   (rangeo 10 1 q))))
+  (test-is (= [6]
+              (run 1 [q]
+                   (fd/in q (fd/interval 1 10))
+                   (rangeo 2 q [2 3 4 5 6]))))
+  (test-is (= [[2 6]]
+              (run 1 [q1 q2]
+                   (fd/in q1 q2 (fd/interval 1 10))
+                   (rangeo q1 q2 [2 3 4 5 6]))))
+  (test-is (= #{[]
+                [1] [1 2] [1 2 3] [1 2 3 4]
+                [2] [2 3] [2 3 4]
+                [3] [3 4]
+                [4]}
+              (set
+                (run* [q]
+                      (fresh [start end]
+                             (fd/in start end (fd/interval 1 4))
+                             (rangeo start end q)))))))
 
 
 (run-tests)
