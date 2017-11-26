@@ -101,6 +101,24 @@ November 26, 2017
        (appendo [h2] temp2  b)
        (splito t2 temp temp2))]))
 
+
+(defn equalo
+  "8. This logic function succeeds if all the elements contained in
+  lst unify to the same value, otherwise fails. The function should
+  always succeed if lst is empty or has only one element."
+  [lst]
+  (conde
+    [(=== lst [])]
+
+    [(fresh [x]
+            (=== lst [x]))]
+
+    [(fresh [head head2 tail tail2]
+            (conso head tail lst)
+            (conso head2 tail2 tail)
+            (equalo tail)
+            (=== head head2))]))
+
 "9"
 (defn counto
   "This logic function unifies result with the number of elements
@@ -114,6 +132,21 @@ November 26, 2017
             (conso head tail lst)
             (fd/+ temp 1 result)
             (counto tail temp))]))
+
+"10"
+(defn rangeo
+  [start end result]
+  (conde
+    [(=== start end)
+     (=== result [end])]
+
+    [(fd/> start end)
+     (=== result [])]
+
+    [(fresh [temp startTemp]
+            (appendo [start] temp result)
+            (fd/+ start 1 startTemp)
+            (rangeo startTemp end temp))]))
 
 
 "Tests 1"
@@ -275,5 +308,8 @@ November 26, 2017
               (run 7 [q1 q2]
                    (fd/in q1 q2 (fd/interval 0 10))
                    (counto q1 q2)))))
+
+"Tests 10"
+
 
 (run-tests)
