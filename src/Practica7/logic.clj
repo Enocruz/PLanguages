@@ -172,8 +172,6 @@ November 26, 2017
             (equalo-util tail fst))]))
 
 
-
-
 "9"
 (defn counto
   "This logic function unifies result with the number of elements
@@ -203,6 +201,7 @@ November 26, 2017
             (fd/+ start 1 nxt)
             (conso start temp result)
             (rangeo nxt end temp))]))
+
 
 
 "Tests 1"
