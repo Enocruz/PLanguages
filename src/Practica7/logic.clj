@@ -25,6 +25,16 @@ November 26, 2017
        (removeo x tail temp)
        (appendo [head] temp result))]))
 
+"2"
+(defn rotateo
+      "This logic function succeeds when lst is rotated left
+      one position giving result"
+      [lst result]
+      (conde
+        [(fresh [rotate inicio fin]
+                (conso inicio fin lst)
+                (appendo fin [inicio] rotate)
+                (=== rotate result))]))
 
 (declare oddsizeo)
 "3"
@@ -50,6 +60,27 @@ November 26, 2017
             (conso head tail lst)
             (!= tail ())
             (evensizeo tail))]))
+
+"4"
+(defn reverseo
+      "Logical function that succeeds if the reverse of lst
+      is result."
+      [lst result]
+      (conde
+        [(=== lst ())
+         (=== result ())]
+
+        [(fresh [head tail temp]
+                (conso head tail lst)
+                (reverseo tail temp)
+                (appendo temp [head] result))]))
+
+(defn palindromeo
+      "This logic function succeeds if lst is a
+      palindrome list (it reads the same from left to
+      right than from right to left)"
+      [lst]
+      (reverseo lst lst))
 
 "5"
 (defn converto
@@ -78,6 +109,23 @@ November 26, 2017
     [(=== d 9)
      (=== k :nine)]))
 
+"6"
+(defn translateo
+  "This logic function succeeds when all digits contained in lst are converted to their
+  corresponding keywords (using the converto logic function from the previous problem)
+  giving result."
+      [lst result]
+      (conde
+        [(=== lst ())
+         (=== result ())]
+        [(fresh [firstLst rstLst firstResult rstResult]
+                (conso firstLst rstLst lst)
+                (conso firstResult rstResult result)
+                (converto firstLst firstResult)
+                (translateo rstLst rstResult))]))
+
+
+
 "7"
 (defn splito
   "This logic function succeeds when splitting lst gives a and b.
@@ -101,6 +149,31 @@ November 26, 2017
        (appendo [h2] temp2  b)
        (splito t2 temp temp2))]))
 
+"8"
+(defn equalo-util
+  "This logic function succeeds if all the elements contained
+  in lst unify to the same value, otherwise fails."
+  [lst x]
+  (conde
+    [(=== lst ())]
+    [(fresh [fst tail]
+            (conso fst tail lst)
+            (=== fst x)
+            (equalo-util tail x))]))
+
+(defn equalo
+  "This logic function succeeds if all the elements contained
+  in lst unify to the same value, otherwise fails."
+  [lst]
+  (conde
+    [(=== lst ())]
+    [(fresh [fst tail]
+            (conso fst tail lst)
+            (equalo-util tail fst))]))
+
+
+
+
 "9"
 (defn counto
   "This logic function unifies result with the number of elements
@@ -114,6 +187,22 @@ November 26, 2017
             (conso head tail lst)
             (fd/+ temp 1 result)
             (counto tail temp))]))
+
+"10"
+(defn rangeo
+  "This logic function unifies result with a sequence of incremental
+  integers from start to end."
+  [start end result]
+  (conde
+    [(fd/> start end)
+     (=== result ())]
+    [(fd/== start end)
+     (=== result [end])]
+    [(fd/> end start)
+     (fresh [temp nxt]
+            (fd/+ start 1 nxt)
+            (conso start temp result)
+            (rangeo nxt end temp))]))
 
 
 "Tests 1"
@@ -141,7 +230,34 @@ November 26, 2017
                [:e [:a :b :c :d]]]
               (run* [q1 q2]
                     (removeo q1 [:a :b :c :d :e] q2)))))
-
+"Tests 2"
+(deftest test-rotateo
+  (test-is (= [:yes]
+              (run 1 [q]
+                   (rotateo [:a :b :c :d :e]
+                            [:b :c :d :e :a])
+                   (=== q :yes))))
+  (test-is (= []
+              (run 1 [q]
+                   (rotateo [:a :b :c :d :e]
+                            [:a :b :c :d :e])
+                   (=== q :yes))))
+  (test-is (= []
+              (run 1 [q] (rotateo [] q))))
+  (test-is (= [[:a]]
+              (run 1 [q] (rotateo [:a] q))))
+  (test-is (= [[:b :c :d :e :a]]
+              (run 1 [q] (rotateo [:a :b :c :d :e] q))))
+  (test-is (= [[:e :a :b :c :d]]
+              (run 1 [q] (rotateo q [:a :b :c :d :e]))))
+  (test-is (= '[[[_0] [_0]]
+                [[_0 _1] [_1 _0]]
+                [[_0 _1 _2] [_1 _2 _0]]
+                [[_0 _1 _2 _3] [_1 _2 _3 _0]]
+                [[_0 _1 _2 _3 _4] [_1 _2 _3 _4 _0]]
+                [[_0 _1 _2 _3 _4 _5] [_1 _2 _3 _4 _5 _0]]
+                [[_0 _1 _2 _3 _4 _5 _6] [_1 _2 _3 _4 _5 _6 _0]]]
+              (run 7 [q1 q2] (rotateo q1 q2)))))
 
 "Tests 3"
 (deftest test-evensizeo-oddsizeo
@@ -171,6 +287,28 @@ November 26, 2017
                 [_0 _1 _2 _3 _4 _5 _6]
                 [_0 _1 _2 _3 _4 _5 _6 _7 _8]]
               (run 5 [q] (oddsizeo q)))))
+
+"Tests 4"
+(deftest test-palindromeo
+  (test-is (= [:yes]
+              (run 1 [q] (palindromeo []) (=== q :yes))))
+  (test-is (= [:yes]
+              (run 1 [q] (palindromeo [:a]) (=== q :yes))))
+  (test-is (= [:yes]
+              (run 1 [q]
+                   (palindromeo [:a :b :c :b :a]) (=== q :yes))))
+  (test-is (= []
+              (run 1 [q]
+                   (palindromeo [:a :b :c :d]) (=== q :yes))))
+  (test-is (= '[[]
+                [_0]
+                [_0 _0]
+                [_0 _1 _0]
+                [_0 _1 _1 _0]
+                [_0 _1 _2 _1 _0]
+                [_0 _1 _2 _2 _1 _0]]
+              (run 7 [q] (palindromeo q)))))
+
 "Test 5"
 (deftest test-converto
   (test-is (= [:yes]
@@ -199,6 +337,24 @@ November 26, 2017
                    (converto q1 :one)
                    (converto 2 q2)
                    (converto q3 :three)))))
+"Tests 6"
+(deftest test-translateo
+         (test-is (= [:yes]
+                     (run 1 [q]
+                          (translateo [1 2 3] [:one :two :three])
+                          (=== q :yes))))
+         (test-is (= []
+                     (run 1 [q]
+                          (translateo [1 2 3] [:one :two :four])
+                          (=== q :yes))))
+         (test-is (= [:three]
+                     (run 1 [q] (translateo [1 2 3] [:one :two q]))))
+         (test-is (= [[:four :five :six :seven :eight :nine]]
+                     (run 1 [q] (translateo [4 5 6 7 8 9] q))))
+         (test-is (= [[1 2 0]]
+                     (run 1 [q] (translateo q [:one :two :zero]))))
+         (test-is (= [[[] []]]
+                     (run 1 [q1 q2] (translateo q1 q2)))))
 
 "Tests 7"
 (deftest test-splito
@@ -234,6 +390,37 @@ November 26, 2017
                 [[_0 _1 _2 _3 _4] [_0 _2 _4] [_1 _3]]
                 [[_0 _1 _2 _3 _4 _5] [_0 _2 _4] [_1 _3 _5]]]
               (run 7 [q1 q2 q3] (splito q1 q2 q3)))))
+
+"Tests 8"
+(deftest test-equalo
+  (test-is (= [:yes]
+              (run 1 [q] (equalo []) (=== q :yes))))
+  (test-is (= [:yes]
+              (run 1 [q] (equalo [:x]) (=== q :yes))))
+  (test-is (= [:yes]
+              (run 1 [q] (equalo [:x :x]) (=== q :yes))))
+  (test-is (= [:yes]
+              (run 1 [q]
+                   (equalo [:x :x :x :x :x]) (=== q :yes))))
+  (test-is (= [:x]
+              (run 1 [q] (equalo [:x :x q :x]))))
+  (test-is (= '[_0]
+              (run 1 [q] (equalo [q q q q q q]))))
+  (test-is (= '([_0 _0 _0 _0 _0])
+              (run 1 [q1 q2 q3 q4 q5]
+                   (equalo [q1 q2 q3 q4 q5]))))
+  (test-is (= []
+              (run 1 [q] (equalo [:x :y]) (=== q :yes))))
+  (test-is (= []
+              (run 1 [q1 q2]
+                   (equalo [q1 q1 q2 q1 q1]) (!= q1 q2))))
+  (test-is (= '([] [_0]
+                 [_0 _0]
+                 [_0 _0 _0]
+                 [_0 _0 _0 _0]
+                 [_0 _0 _0 _0 _0]
+                 [_0 _0 _0 _0 _0 _0])
+              (run 7 [q] (equalo q)))))
 
 "Tests 9"
 (deftest test-counto
@@ -275,5 +462,35 @@ November 26, 2017
               (run 7 [q1 q2]
                    (fd/in q1 q2 (fd/interval 0 10))
                    (counto q1 q2)))))
+
+"Tests 10"
+(deftest test-rangeo
+  (test-is (= [[3 4 5 6 7 8 9 10]]
+              (run 1 [q]
+                   (rangeo 3 10 q))))
+  (test-is (= [[7]]
+              (run 1 [q]
+                   (rangeo 7 7 q))))
+  (test-is (= [[]]
+              (run 1 [q]
+                   (rangeo 10 1 q))))
+  (test-is (= [6]
+              (run 1 [q]
+                   (fd/in q (fd/interval 1 10))
+                   (rangeo 2 q [2 3 4 5 6]))))
+  (test-is (= [[2 6]]
+              (run 1 [q1 q2]
+                   (fd/in q1 q2 (fd/interval 1 10))
+                   (rangeo q1 q2 [2 3 4 5 6]))))
+  (test-is (= #{[]
+                [1] [1 2] [1 2 3] [1 2 3 4]
+                [2] [2 3] [2 3 4]
+                [3] [3 4]
+                [4]}
+              (set
+                (run* [q]
+                      (fresh [start end]
+                             (fd/in start end (fd/interval 1 4))
+                             (rangeo start end q)))))))
 
 (run-tests)
